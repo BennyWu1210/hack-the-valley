@@ -3,7 +3,6 @@ package resume
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -144,6 +143,7 @@ type GPT4Response struct {
 
 // Request struct to capture the resume string passed in the POST request
 type TextInput struct {
+	JobDescription string `json:"job_description"`
 	Resume string `json:"resume"`
 }
 
@@ -165,7 +165,7 @@ func GenerateResumeHandler(c *gin.Context) {
 	// Create the GPT-4 message with the provided resume content
 	messages := []Message{
 		{Role: "system", Content: "You are a helpful assistant who generates structured resumes."},
-		{Role: "user", Content: fmt.Sprintf("Please generate a structured resume from the following input:\n%s", input.Resume)},
+		{Role: "user", Content: "Please generate a structured resume from the following input that is most relavent to the job description\n\nResume:" + input.Resume + "\n\njob description:" + input.JobDescription},
 	}
 
 	// Define the schema for the expected response
