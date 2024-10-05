@@ -71,18 +71,29 @@ const SortableItem: React.FC<SortableItemProps> = ({ id }) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    padding: '8px',
+    padding: '6px',
+    paddingLeft: '12px',
+    paddingRight: '12px',
     margin: '0 0 8px 0',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
+    borderRadius: '10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: 'white',
   };
 
   return (
     <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {id}
+      <div className="flex flex-row justify-between align-center w-full items-center">
+        <div>
+          {id}
+        </div>
+        <div>
+
+        <img src="/images/SelectBar.svg" alt="grip" style={{ width: '20px', height: '20px' }} />
+        </div>
+
+      </div>
     </li>
   );
 };

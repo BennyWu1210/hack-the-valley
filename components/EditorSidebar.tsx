@@ -1,9 +1,19 @@
+import { useState } from "react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RadialChart } from "@/components/RadialChart"
+import DraggableList from "./DraggableList";
 
 export default function EditorSidebar() {
+    const [items, setItems] = useState<string[]>(['Education', 'Experience', 'Projects', 'Skills']);
+
+    const handleListUpdate = (newOrder: string[]) => {
+        setItems(newOrder);
+        console.log('Updated order in parent:', newOrder); // Log in the parent when the order changes
+      };
+
   return (
-    <div className="bg-gray-200 border w-full h-full p-10 justify-start">
+    <div className="bg-gray-100 border w-full h-full p-10 justify-start">
         <Tabs defaultValue="info" className="min-w-full">
         <TabsList>
             <TabsTrigger value="info">Info</TabsTrigger>
@@ -56,7 +66,10 @@ export default function EditorSidebar() {
 
             </div>
         </TabsContent>
-        <TabsContent value="edit">Edit</TabsContent>
+        <TabsContent value="edit">
+            <h1 className="mb-2 pt-2">Resume Sections</h1>
+            <DraggableList items={items} setItems={handleListUpdate} />
+        </TabsContent>
         <TabsContent value="evaluate">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pt-2 max-w-5xl">
                 {/* Top Box (larger box) */}
