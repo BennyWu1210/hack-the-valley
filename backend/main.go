@@ -5,55 +5,12 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"example/backend/resume"
+	"github.com/gin-contrib/cors"
+	
 	//openai
 	"context"
-	"encoding/json"
 	openai "github.com/sashabaranov/go-openai"
 )
-
-
-
-// resume block=---------------------------------------
-type TextInput struct {
-	Resume string `json:"Resume"`
-}
-// generates 5 blocks from master resume that is most relavent to the job description
-// post request to recieve resume in text formate
-// send the resume to GPT with the full prompte
-// recieve the 5 blocks as a JSON response
-func gnerateBlock(c *gin.Context) {
-	var input TextInput
-
-	// Bind the JSON request body to the struct
-	if err := c.ShouldBindJSON(&input); err != nil {
-		// If there is an error in binding, return a bad request response
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	prePrompt := "Response ONLY in valid JSON format with the structure"
-	question := "You are an expert at breaking down complex resume experiences provided below into individual sections. Please respond with 5 section. "
-	//content := input.Resume
-
-
-	responseText := GPTResponse(prePrompt, question, "I worked at google as a software engineer doing backend dev with java spring boot from 2023-2027 at toronto canada")
-
-	// Return the new text
-	var jsonResponse []map[string]interface{}
-	if err := json.Unmarshal([]byte(responseText), &jsonResponse); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":    "Invalid JSON format returned by GPT",
-			"response": responseText,
-		})
-		return
-	}
-
-	// Return the parsed JSON response
-	c.JSON(http.StatusOK, responseText)
-
-}
 
 // get request to /test
 func GPTResponse(prePrompt string, question string, content string) string {
@@ -88,9 +45,15 @@ func getOutput(c *gin.Context) {
 
 func main() {
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"}, // Replace with your frontend's origin
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	router.GET("/test", getOutput)
-	router.POST("/blocks", gnerateBlock)
 	router.POST("/blocks1", resume.GenerateResumeHandler)
 	router.Run("localhost:8080")
 }
