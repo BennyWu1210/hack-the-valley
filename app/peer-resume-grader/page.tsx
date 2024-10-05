@@ -1,17 +1,8 @@
 "use client";
 
-import Link from "next/link"
 import {
-  Bell,
   CircleUser,
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
   Search,
-  ShoppingCart,
-  Users,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -29,17 +20,17 @@ import { Input } from "@/components/ui/input"
 
 import { useState } from "react";
 import { Resume } from "@/utils/schema/ResumeSchema";
-import ResumeItem from "./ResumeItem";
-import Hamburger from "../nav/Hamburger";
-import Nav from "../nav/Nav";
+import ResumeItem from "@/components/dashboard/ResumeItem";
+import Nav from "@/components/nav/Nav";
+import Hamburger from "@/components/nav/Hamburger";
+ResumeItem
 
 export const description =
   "Resume Dashbaord"
 
+export default function Page() {
 
-
-export default function Dashboard() {
-  const [resumeList, setResumeList] = useState<Resume[]>([]); // should be global context later????
+  const [resumeList, setResumeList] = useState<Resume[]>([{id: "Meta SWE", name: "Meta SWE", owner: "John", date: new Date(Date.now())}]); // TODO: should be global context later???? 
 
   const addNewResume = (newItem: Resume) => {
     setResumeList(prev => [...prev, newItem]);
@@ -51,18 +42,6 @@ export default function Dashboard() {
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <Hamburger />
-          <div className="w-full flex-1">
-            <form>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-                />
-              </div>
-            </form>
-          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full">
@@ -80,17 +59,18 @@ export default function Dashboard() {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="flex flex-1 flex-col gap-8 p-4 lg:gap-6 lg:p-6">
-          <div className="flex items-center">
-            <h1 className="text-lg font-semibold md:text-2xl">Resume List</h1>
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <div className="">
+            <h1 className="text-lg font-semibold md:text-2xl">List of Reviews</h1>
+            <h3 className="my-2 font-thin">When you review a resume, someone else will also review your’s within 24 hours. </h3>
+            <Button>Review a Resume</Button>
           </div>
           <div
             className="flex flex-1 rounded-lg border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
           >
 
             {resumeList.length > 0 ?
-              <div className="w-full p-8 grid gap-2 grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
-                <ResumeItem key={"Add button"} resume={{ id: "Add button", name: "Add button", date: new Date(Date.now()) }} addButton={true} addNewResume={addNewResume} />
+              <div className="w-full p-8 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
                 {resumeList.map((resume) => (<ResumeItem key={resume.id} resume={resume} addButton={false} addNewResume={(resume: Resume) => { }} />))}
               </div>
               :
@@ -98,12 +78,12 @@ export default function Dashboard() {
                 className="flex flex-col flex-1 items-center justify-center" x-chunk="dashboard-02-chunk-1"
               >
                 <h3 className="text-2xl font-bold tracking-tight">
-                  You have no resume added
+                  No Review Found
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Create your first resume to get started
+                  Resumes will appear here once they have been reviewed
                 </p>
-                <Button className="mt-4" onClick={() => addNewResume({ id: "resume " + (resumeList.length + 1), name: "New Resume!", date: new Date(Date.now()) })}>Create New</Button>
+                <Button className="mt-4" onClick={() => alert("Request Sent!")}>Request Review</Button>
               </div>
             }
 
