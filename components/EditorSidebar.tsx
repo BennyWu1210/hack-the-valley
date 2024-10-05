@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import { RadialChart } from "@/components/RadialChart"
 
 export default function EditorSidebar() {
   return (
@@ -57,7 +57,47 @@ export default function EditorSidebar() {
             </div>
         </TabsContent>
         <TabsContent value="edit">Edit</TabsContent>
-        <TabsContent value="evaluate">Evaluate</TabsContent>
+        <TabsContent value="evaluate">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pt-2 max-w-5xl">
+                {/* Top Box (larger box) */}
+                <div className="col-span-1 md:col-span-2 bg-white p-3 rounded-lg shadow-lg max-h-[240px]">
+                    <h2 className="text-xl font-semibold text-center mb-[-5px]">Overall Score</h2>
+                    <RadialChart score={3} isSmall={false}/>
+                </div>
+
+                {/* Small Boxes */}
+                <div className="bg-white py-3 px-2 rounded-lg shadow-lg">
+                    <h3 className="text-sm font-semibold text-center mb-[-15px]">Content & Accuracy</h3>
+                    <RadialChart score={5} isSmall={true}/>
+                    <p className="text-center mt-[-15px] text-xs text-slate-500">
+                        Covers material with correct, accurate information.
+                    </p>
+                </div>
+                <div className="bg-white py-3 px-2 rounded-lg shadow-lg">
+                    <h3 className="text-sm font-semibold text-center mb-[-15px]">Creativity</h3>
+                    <RadialChart score={10} isSmall={true}/>
+                    <p className="text-center mt-[-15px] text-xs text-slate-500">
+                        Original ideas with unique, inventive approach.
+                    </p>
+                </div>
+                <div className="bg-white py-3 px-2 rounded-lg shadow-lg">
+                    <h3 className="text-sm font-semibold text-center mb-[-15px]">Organization & Clarity</h3>
+                    <RadialChart score={10} isSmall={true}/>
+                    <p className="text-center mt-[-15px] text-xs text-slate-500">
+                        Clear structure with logical, understandable flow.
+                    </p>
+                </div>
+                <div className="bg-white py-3 px-2 rounded-lg shadow-lg">
+                    <h3 className="text-sm font-semibold text-center mb-[-15px]">Technical Skills</h3>
+                    <RadialChart score={10} isSmall={true}/>
+                    <p className="text-center mt-[-15px] text-xs text-slate-500">
+                        Demonstrates strong mastery of technical skills.
+                    </p>
+                </div>
+            </div>
+
+
+        </TabsContent>
         </Tabs>
     </div>
   );
