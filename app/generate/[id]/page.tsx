@@ -5,6 +5,7 @@ import { Editor } from "@tinymce/tinymce-react"; // TinyMCE editor
 import type { Editor as TinyMCEEditor } from "tinymce"; // Import TinyMCE types
 import ResumeUpload from "../../../components/ResumeUpload";
 import DraggableList from "../../../components/DraggableList";
+import EditorSidebar from "../../../components/EditorSidebar";
 
 interface Params {
   id: string;
@@ -143,7 +144,7 @@ const GeneratePage = ({ params }: { params: Params }) => {
 
   return (
     <div className="flex flex-row">
-      <div className="flex-1">
+      <div className="basis-[70%] border border-green-500">
         {/* TinyMCE Editor */}
         <Editor
           apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
@@ -219,11 +220,11 @@ const GeneratePage = ({ params }: { params: Params }) => {
           Set New Content
         </button>
 
-        <DraggableList items={items} setItems={handleListUpdate} />
+        {/* <DraggableList items={items} setItems={handleListUpdate} /> */}
         <ResumeUpload />
       </div>
-      <div className="flex-1">
-        Right side
+      <div className="basis-[30%]">
+        <EditorSidebar />
       </div>
     </div>
   );
