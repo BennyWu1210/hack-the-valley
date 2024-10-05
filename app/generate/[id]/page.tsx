@@ -14,12 +14,8 @@ interface Params {
 const GeneratePage = ({ params }: { params: Params }) => {
   const { id } = params;
   const editorRef = useRef<TinyMCEEditor | null>(null);
-  const [items, setItems] = useState<string[]>(['Education', 'Experience', 'Projects', 'Skills']);
 
-  const handleListUpdate = (newOrder: string[]) => {
-    setItems(newOrder);
-    console.log('Updated order in parent:', newOrder); // Log in the parent when the order changes
-  };
+
 
   const log = () => {
     if (editorRef.current) {
