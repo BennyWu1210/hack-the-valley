@@ -1,7 +1,9 @@
 "use client";
-export default function Home() {
 
+import { Button } from "@/components/ui/button";
+
+export default function Home() {
   return (
-    <div>Home</div>
+    <Button>Home</Button>
   );
 }
