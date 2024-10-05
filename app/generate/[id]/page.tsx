@@ -142,84 +142,89 @@ const GeneratePage = ({ params }: { params: Params }) => {
   };
 
   return (
-    <div>
-      {/* TinyMCE Editor */}
-      <Editor
-        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-        onInit={handleEditorInit} // Attach the event listeners during init
-        initialValue="<p style='color: blue;'>This is the initial content of the editor.</p>"
-        init={{
-          height: "100vh", // Limit the editor to 100vh for scrollability
-          width: 794, // A4 width in pixels (~210mm)
-          menubar: false,
-          plugins: [
-            "advlist",
-            "autolink",
-            "lists",
-            "link",
-            "image",
-            "charmap",
-            "preview",
-            "anchor",
-            "searchreplace",
-            "visualblocks",
-            "code",
-            "fullscreen",
-            "insertdatetime",
-            "media",
-            "table",
-            "code",
-            "help",
-            "wordcount",
-          ],
-          toolbar:
-            "undo redo | blocks | bold italic forecolor | alignleft aligncenter " +
-            "alignright alignjustify | bullist numlist outdent indent | removeformat | help | exportpdf",
-          setup: (editor) => {
-            // Add custom button for exporting to PDF
-            editor.ui.registry.addButton("exportpdf", {
-              text: "Export PDF",
-              onAction: exportToPDF,
-            });
-          },
-          content_style: `
-            body { 
-              font-family: Helvetica,Arial,sans-serif; 
-              font-size: 14px; 
-              color: black; 
-              line-height: 1.5; 
-              padding: 25px; 
-              box-sizing: border-box; 
-              margin: 0;
-              height: auto; /* Allow content to grow */
-              width: 794px; /* A4 width */
-              overflow-y: scroll;
-              position: relative;
-            }
-            p, h1 {
-              margin: 0;
-              padding-bottom: 5px;
-            }
-            .page-break {
-              display: block;
-              page-break-before: always;
-              border-top: 1px dashed black;
-              margin: 40px 0;
-            }
-          `,
-        }}
-      />
+    <div className="flex flex-row">
+      <div className="flex-1">
+        {/* TinyMCE Editor */}
+        <Editor
+          apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
+          onInit={handleEditorInit} // Attach the event listeners during init
+          initialValue="<p style='color: blue;'>This is the initial content of the editor.</p>"
+          init={{
+            height: "100vh", // Limit the editor to 100vh for scrollability
+            width: 794, // A4 width in pixels (~210mm)
+            menubar: false,
+            plugins: [
+              "advlist",
+              "autolink",
+              "lists",
+              "link",
+              "image",
+              "charmap",
+              "preview",
+              "anchor",
+              "searchreplace",
+              "visualblocks",
+              "code",
+              "fullscreen",
+              "insertdatetime",
+              "media",
+              "table",
+              "code",
+              "help",
+              "wordcount",
+            ],
+            toolbar:
+              "undo redo | blocks | bold italic forecolor | alignleft aligncenter " +
+              "alignright alignjustify | bullist numlist outdent indent | removeformat | help | exportpdf",
+            setup: (editor) => {
+              // Add custom button for exporting to PDF
+              editor.ui.registry.addButton("exportpdf", {
+                text: "Export PDF",
+                onAction: exportToPDF,
+              });
+            },
+            content_style: `
+              body { 
+                font-family: Helvetica,Arial,sans-serif; 
+                font-size: 14px; 
+                color: black; 
+                line-height: 1.5; 
+                padding: 25px; 
+                box-sizing: border-box; 
+                margin: 0;
+                height: auto; /* Allow content to grow */
+                width: 794px; /* A4 width */
+                overflow-y: scroll;
+                position: relative;
+              }
+              p, h1 {
+                margin: 0;
+                padding-bottom: 5px;
+              }
+              .page-break {
+                display: block;
+                page-break-before: always;
+                border-top: 1px dashed black;
+                margin: 40px 0;
+              }
+            `,
+          }}
+        />
 
-      {/* Button to log editor content */}
-      <button onClick={log}>Log editor content</button>
+        {/* Button to log editor content */}
+        <button onClick={log}>Log editor content</button>
 
-      {/* Button to set content programmatically */}
-      <button onClick={() => setEditorContent("<p>This is some new content!</p>")}>
-        Set New Content
-      </button>
+        {/* Button to set content programmatically */}
+        <button onClick={() => setEditorContent("<p>This is some new content!</p>")}>
+          Set New Content
+        </button>
 
-      <DraggableList items={items} setItems={handleListUpdate} />
-      <ResumeUpload />
+        <DraggableList items={items} setItems={handleListUpdate} />
+        <ResumeUpload />
+      </div>
+      <div className="flex-1">
+        Right side
+      </div>
     </div>
   );
 };
