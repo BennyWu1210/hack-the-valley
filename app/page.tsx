@@ -1,9 +1,6 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
+import Dashboard from "@/components/dashboard/Dashboard";
 
 export default function Home() {
-  return (
-    <Button>Home</Button>
-  );
+  return <Dashboard />
 }
+
