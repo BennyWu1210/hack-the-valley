@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react'; // TinyMCE editor
 import type { Editor as TinyMCEEditor } from 'tinymce'; // Import TinyMCE types
+import ResumeUpload from '../components/ResumeUpload'; 
 
 export default function Home() {
   const editorRef = useRef<TinyMCEEditor | null>(null);
@@ -176,6 +177,7 @@ export default function Home() {
 
       {/* Button to log editor content */}
       <button onClick={log}>Log editor content</button>
+      <ResumeUpload />
     </div>
   );
 }
