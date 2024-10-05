@@ -1,9 +1,11 @@
 "use client";
 
+import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  return (
-    <Button>Home</Button>
-  );
+  return <div>
+    <Dashboard />
+  </div>
 }
+
