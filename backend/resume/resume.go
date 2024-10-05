@@ -47,7 +47,7 @@ type ResumeStructure struct {
 	Experience          ExperienceSchema   `json:"experience"`
 	Education           EducationSchema    `json:"education"`
 	Projects            ProjectsSchema     `json:"projects"`
-	ProgramingLanguages           LanguagesSchema    `json:"programinglanguages"`
+	ProgramingLanguages LanguagesSchema    `json:"programinglanguages"`
 	Technologies        TechnologiesSchema `json:"technologies"`
 }
 
@@ -165,7 +165,7 @@ func GenerateResumeHandler(c *gin.Context) {
 	// Create the GPT-4 message with the provided resume content
 	messages := []Message{
 		{Role: "system", Content: "You are a helpful assistant who generates structured resumes."},
-		{Role: "user", Content: "Please generate a structured resume with the provided format."},
+		{Role: "user", Content: fmt.Sprintf("Please generate a structured resume from the following input:\n%s", input.Resume)},
 	}
 
 	// Define the schema for the expected response
@@ -249,7 +249,7 @@ func GenerateResumeHandler(c *gin.Context) {
 							},
 						},
 					},
-					Required: []string{"contact_information", "professional_summary", "experience", "education", "projects", "languages", "technologies"},
+					Required: []string{"contact_information", "professional_summary", "experience", "education", "projects", "programinglanguages", "technologies"},
 				},
 			},
 		},
@@ -263,7 +263,6 @@ func GenerateResumeHandler(c *gin.Context) {
 	}
 
 	req, err := http.NewRequest("POST", openaiURL, bytes.NewBuffer(jsonBody))
-	fmt.Println("req1", req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating request"})
 		return
@@ -274,7 +273,6 @@ func GenerateResumeHandler(c *gin.Context) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	fmt.Println("req2", resp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error sending request to OpenAI"})
 		return
