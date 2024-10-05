@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react"; // TinyMCE editor
 import type { Editor as TinyMCEEditor } from "tinymce"; // Import TinyMCE types
 import ResumeUpload from "../../../components/ResumeUpload";
+import DraggableList from "../../../components/DraggableList";
 
 interface Params {
   id: string;
@@ -12,6 +13,12 @@ interface Params {
 const GeneratePage = ({ params }: { params: Params }) => {
   const { id } = params;
   const editorRef = useRef<TinyMCEEditor | null>(null);
+  const [items, setItems] = useState<string[]>(['Education', 'Experience', 'Projects', 'Skills']);
+
+  const handleListUpdate = (newOrder: string[]) => {
+    setItems(newOrder);
+    console.log('Updated order in parent:', newOrder); // Log in the parent when the order changes
+  };
 
   const log = () => {
     if (editorRef.current) {
@@ -19,7 +26,14 @@ const GeneratePage = ({ params }: { params: Params }) => {
     }
   };
 
-  // Function to dynamically check and insert page breaks
+  // Function to set content programmatically
+  const setEditorContent = (newContent: string) => {
+    if (editorRef.current) {
+      editorRef.current.setContent(newContent); // Set new content in the editor
+    }
+  };
+
+  // Function to dynamically check and insert page breaks (unchanged)
   const simulatePageBreaks = () => {
     if (!editorRef.current) return;
 
@@ -198,9 +212,16 @@ const GeneratePage = ({ params }: { params: Params }) => {
 
       {/* Button to log editor content */}
       <button onClick={log}>Log editor content</button>
+
+      {/* Button to set content programmatically */}
+      <button onClick={() => setEditorContent("<p>This is some new content!</p>")}>
+        Set New Content
+      </button>
+
+      <DraggableList items={items} setItems={handleListUpdate} />
       <ResumeUpload />
     </div>
   );
-}
+};
 
 export default GeneratePage;
