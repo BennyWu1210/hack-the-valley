@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"example/backend/resume"
-	"example/backend/resume1"
+	"example/backend/scrape"
 	"github.com/gin-contrib/cors"
 	
 	//openai
@@ -55,7 +55,7 @@ func main() {
 	}))
 
 	router.GET("/test", getOutput)
-	router.POST("/blocks1", resume.GenerateResumeHandler)
-	router.POST("/blocks2", resume1.GenerateResumeHandler)
+	router.POST("/blocks", resume.GenerateResumeHandler)
+	router.POST("/scrape", scrape.ScrapeJobDescription)
 	router.Run("localhost:8080")
 }
