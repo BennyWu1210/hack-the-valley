@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,9 +14,9 @@ const openaiURL = "https://api.openai.com/v1/chat/completions"
 // Structures for the GPT request/response handling
 
 type GPT4Request struct {
-	Model          string            `json:"model"`
-	Messages       []Message         `json:"messages"`
-	ResponseFormat ResponseFormat    `json:"response_format"`
+	Model          string         `json:"model"`
+	Messages       []Message      `json:"messages"`
+	ResponseFormat ResponseFormat `json:"response_format"`
 }
 
 type Message struct {
@@ -40,26 +41,92 @@ type Schema struct {
 }
 
 type ResumeStructure struct {
-	Sections SectionSchema `json:"sections"`
+	ContactInformation  ContactInfoSchema  `json:"contact_information"`
+	ProfessionalSummary Property           `json:"professional_summary"`
+	Experience          ExperienceSchema   `json:"experience"`
+	Education           EducationSchema    `json:"education"`
+	Projects            ProjectsSchema     `json:"projects"`
+	ProgramingLanguages LanguagesSchema    `json:"programinglanguages"`
+	Technologies        TechnologiesSchema `json:"technologies"`
 }
 
-type SectionSchema struct {
-	Type  string `json:"type"`
-	Items Item   `json:"items"`
+type ContactInfoSchema struct {
+	Type       string      `json:"type"`
+	Properties ContactInfo `json:"properties"`
+	Required   []string    `json:"required"`
 }
 
-type Item struct {
-	Type       string   `json:"type"`
-	Properties Section  `json:"properties"`
-	Required   []string `json:"required"`
+type ContactInfo struct {
+	Name    Property `json:"name"`
+	Email   Property `json:"email"`
+	Phone   Property `json:"phone"`
+	Address Property `json:"address"`
 }
 
-type Section struct {
-	Section     Property `json:"section"`
+type ExperienceSchema struct {
+	Type  string     `json:"type"`
+	Items Experience `json:"items"`
+}
+
+type Experience struct {
+	Type       string    `json:"type"`
+	Properties JobDetail `json:"properties"`
+	Required   []string  `json:"required"`
+}
+
+type JobDetail struct {
+	JobTitle    Property `json:"job_title"`
 	Company     Property `json:"company"`
-	Location    Property `json:"location"`
-	Date        Property `json:"date"`
+	StartDate   Property `json:"start_date"`
+	EndDate     Property `json:"end_date"`
 	Description Property `json:"description"`
+}
+
+type EducationSchema struct {
+	Type  string    `json:"type"`
+	Items Education `json:"items"`
+}
+
+type Education struct {
+	Type       string     `json:"type"`
+	Properties DegreeInfo `json:"properties"`
+	Required   []string   `json:"required"`
+}
+
+type DegreeInfo struct {
+	Degree         Property `json:"degree"`
+	Institution    Property `json:"institution"`
+	GraduationYear Property `json:"graduation_year"`
+	Description    Property `json:"description"`
+}
+
+type ProjectsSchema struct {
+	Type  string   `json:"type"`
+	Items Project  `json:"items"`
+}
+
+type Project struct {
+	Type       string       `json:"type"`
+	Properties ProjectProps `json:"properties"`
+	Required   []string     `json:"required"`
+}
+
+type ProjectProps struct {
+	ProjectName      Property   `json:"project_name"`
+	Description      Property   `json:"description"`
+	TechnologiesUsed TechnologiesSchema `json:"technologies_used"`
+	StartDate        Property   `json:"start_date"`
+	EndDate          Property   `json:"end_date"`
+}
+
+type LanguagesSchema struct {
+	Type  string   `json:"type"`
+	Items Property `json:"items"`
+}
+
+type TechnologiesSchema struct {
+	Type  string   `json:"type"`
+	Items Property `json:"items"`
 }
 
 type Property struct {
@@ -74,26 +141,15 @@ type GPT4Response struct {
 	} `json:"choices"`
 }
 
-type Resume struct {
-	Sections []ResumeSection `json:"sections"`
-}
-
-type ResumeSection struct {
-	Section     string `json:"section"`
-	Company     string `json:"company"`
-	Location    string `json:"location"`
-	Date        string `json:"date"`
-	Description string `json:"description"`
-}
-
 // Request struct to capture the resume string passed in the POST request
 type TextInput struct {
+	JobDescription string `json:"job_description"`
 	Resume string `json:"resume"`
 }
 
 // Exported function: GenerateResumeHandler
 func GenerateResumeHandler(c *gin.Context) {
-	apiKey := "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"
+	apiKey := "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"
 	if apiKey == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "API key is missing"})
 		return
@@ -109,7 +165,7 @@ func GenerateResumeHandler(c *gin.Context) {
 	// Create the GPT-4 message with the provided resume content
 	messages := []Message{
 		{Role: "system", Content: "You are a helpful assistant who generates structured resumes."},
-		{Role: "user", Content: "Here is a resume: \"" + input.Resume + "\". Please generate a structured resume with 4-5 sections. Each section should have the following fields: section, company, location, date, and description."},
+		{Role: "user", Content: "Please generate a structured resume from the following input that is most relavent to the job description\n\nResume:" + input.Resume + "\n\njob description:" + input.JobDescription},
 	}
 
 	// Define the schema for the expected response
@@ -119,26 +175,81 @@ func GenerateResumeHandler(c *gin.Context) {
 		ResponseFormat: ResponseFormat{
 			Type: "json_schema",
 			JSONSchema: JSONSchema{
-				Name: "resume_response",
+				Name:   "resume_response",
 				Schema: Schema{
 					Type: "object",
 					Properties: ResumeStructure{
-						Sections: SectionSchema{
+						ContactInformation: ContactInfoSchema{
+							Type: "object",
+							Properties: ContactInfo{
+								Name:    Property{Type: "string"},
+								Email:   Property{Type: "string"},
+								Phone:   Property{Type: "string"},
+								Address: Property{Type: "string"},
+							},
+							Required: []string{"name", "email", "phone", "address"},
+						},
+						ProfessionalSummary: Property{Type: "string"},
+						Experience: ExperienceSchema{
 							Type: "array",
-							Items: Item{
+							Items: Experience{
 								Type: "object",
-								Properties: Section{
-									Section:     Property{Type: "string"},
+								Properties: JobDetail{
+									JobTitle:    Property{Type: "string"},
 									Company:     Property{Type: "string"},
-									Location:    Property{Type: "string"},
-									Date:        Property{Type: "string"},
+									StartDate:   Property{Type: "string"},
+									EndDate:     Property{Type: "string"},
 									Description: Property{Type: "string"},
 								},
-								Required: []string{"section", "company", "location", "date", "description"},
+								Required: []string{"job_title", "company", "start_date", "description"},
+							},
+						},
+						Education: EducationSchema{
+							Type: "array",
+							Items: Education{
+								Type: "object",
+								Properties: DegreeInfo{
+									Degree:         Property{Type: "string"},
+									Institution:    Property{Type: "string"},
+									GraduationYear: Property{Type: "string"},
+									Description:    Property{Type: "string"},
+								},
+								Required: []string{"degree", "institution", "graduation_year"},
+							},
+						},
+						Projects: ProjectsSchema{
+							Type: "array",
+							Items: Project{
+								Type: "object",
+								Properties: ProjectProps{
+									ProjectName:      Property{Type: "string"},
+									Description:      Property{Type: "string"},
+									TechnologiesUsed: TechnologiesSchema{
+										Type: "array",
+										Items: Property{
+											Type: "string",
+										},
+									},
+									StartDate: Property{Type: "string"},
+									EndDate:   Property{Type: "string"},
+								},
+								Required: []string{"project_name", "description", "technologies_used"},
+							},
+						},
+						ProgramingLanguages: LanguagesSchema{
+							Type: "array",
+							Items: Property{
+								Type: "string",
+							},
+						},
+						Technologies: TechnologiesSchema{
+							Type: "array",
+							Items: Property{
+								Type: "string",
 							},
 						},
 					},
-					Required: []string{"sections"},
+					Required: []string{"contact_information", "professional_summary", "experience", "education", "projects", "programinglanguages", "technologies"},
 				},
 			},
 		},
@@ -176,6 +287,7 @@ func GenerateResumeHandler(c *gin.Context) {
 
 	var gptResponse GPT4Response
 	err = json.Unmarshal(body, &gptResponse)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error parsing response from OpenAI"})
 		return
@@ -185,7 +297,7 @@ func GenerateResumeHandler(c *gin.Context) {
 	content := gptResponse.Choices[0].Message.Content
 
 	// Parse the JSON string inside the content field into a Resume struct
-	var parsedResume Resume
+	var parsedResume map[string]interface{}
 	err = json.Unmarshal([]byte(content), &parsedResume)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error parsing inner JSON from content"})
