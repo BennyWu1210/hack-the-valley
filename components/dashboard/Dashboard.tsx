@@ -32,6 +32,7 @@ import { Resume } from "@/utils/schema/ResumeSchema";
 import ResumeItem from "./ResumeItem";
 import Hamburger from "../nav/Hamburger";
 import Nav from "../nav/Nav";
+import { useGlobalContext } from "@/app/GlobalContext";
 
 export const description =
   "Resume Dashbaord"
@@ -39,10 +40,10 @@ export const description =
 
 
 export default function Dashboard() {
-  const [resumeList, setResumeList] = useState<Resume[]>([]); // should be global context later????
+  const { resumeList, setResumeList } = useGlobalContext();
 
   const addNewResume = (newItem: Resume) => {
-    setResumeList(prev => [...prev, newItem]);
+    setResumeList([...resumeList, newItem]);
   }
 
   return (
