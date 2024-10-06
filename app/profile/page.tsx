@@ -63,6 +63,9 @@ const chartConfig = {
 } satisfies ChartConfig
 
 
+import { useGlobalContext } from "@/app/GlobalContext";
+
+
 const Achievements = ({title, description, progress, level}) => {
     return (
         <Card className="w-full flex-1 p-8 flex flex-row gap-8">
@@ -82,7 +85,33 @@ const Achievements = ({title, description, progress, level}) => {
 
 const page = () => {
     const [progress, setProgress] = React.useState(13)
- 
+
+    const {user, setUser} = useGlobalContext();
+    const [nameInput, setNameInput] = React.useState(user?.name || '');
+    const [emailInput, setEmailInput] = React.useState(user?.email || '');
+  
+
+    // Handle input change for name
+  const handleNameChange = (e) => {
+    setNameInput(e.target.value);
+  };
+
+  // Handle input change for email
+  const handleEmailChange = (e) => {
+    setEmailInput(e.target.value);
+  };
+
+  // Update user when "Enter" is pressed
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      setUser({
+        id: user?.id || '',  // Preserve the id or provide a default value
+        name: nameInput,
+        email: emailInput,
+      });
+    }
+  };
+
   React.useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500)
     return () => clearTimeout(timer)
@@ -126,7 +155,7 @@ const page = () => {
                             <CircleUser className="w-full h-full aspect-square" />
                         </div>
                         <div className='flex flex-col justify-center gap-2'>
-                            <CardTitle className='text-4xl'>Colin Ng</CardTitle>
+                            <CardTitle className='text-4xl'>{user?.name || 'Guest'}</CardTitle>
                             <CardDescription>AWS Cloud Engineer</CardDescription>
                             <Separator/>
                             <div className='border rounded-sm w-fit px-4 py-1'>2540 XP</div>
@@ -137,17 +166,6 @@ const page = () => {
                     <Card>
                         <CardContent className="pb-0">
                             <div className='flex flex-1 flex-row min-w-[300px] items-center gap-4'>
-                                {/* <div className='flex flex-col gap-2 py-4'>
-                                    <CardHeader className='px-0 py-0'>Soft Skills</CardHeader>
-                                    <CardDescription>       
-                                        <span className="text-green-500">↑ 2%</span> Soft skill 1 ababababaa<br />
-                                        <span className="text-red-500">↓ 10%</span> Soft skill 2<br />
-                                        — Soft skill 1<br />
-                                        <span className="text-red-500">↓ 10%</span> Soft skill 2<br />
-                                        <span className="text-green-500">↑ 2%</span> Soft skill 1<br />
-                                        <span className="text-red-500">↓ 10%</span> Soft skill 2
-                                    </CardDescription>
-                                </div> */}
                                 <div className='flex-1 min-h-full'>
                                     <ChartContainer
                                     config={chartConfig}
@@ -180,20 +198,34 @@ const page = () => {
                     {/* PROFILE */}
                     <TabsContent value="profile">
                         <div className='flex flex-col mt-8 gap-8'>
-                            <div className='flex gap-20'>
-                                <div className="grid w-96 items-center gap-1.5">
-                                <Label htmlFor="email">First Name</Label>
-                                <Input className='w-72' type="email" id="email" placeholder="Colin" />
-                                </div>
-
-                                <div className="grid w-96 items-center gap-1.5">
-                                <Label htmlFor="email">Last Name</Label>
-                                <Input className='w-72' type="email" id="email" placeholder="Ng" />
-                                </div>  
+                            <div className="grid w-96 items-center gap-1.5">
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                className="w-72"
+                                type="text"
+                                id="name"
+                                value={nameInput}
+                                onChange={handleNameChange}
+                                onKeyDown={handleKeyPress}
+                                placeholder={user?.name || "John"}
+                                />
                             </div>
 
                             <div className="grid w-96 items-center gap-1.5">
-                                <Label htmlFor="email">Goals</Label>
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                className="w-72"
+                                type="email"
+                                id="email"
+                                value={emailInput}
+                                onChange={handleEmailChange}
+                                onKeyDown={handleKeyPress}
+                                placeholder={user?.email || "example@gmail.com"}
+                                />
+                            </div>
+
+                            <div className="grid w-96 items-center gap-1.5">
+                                <Label htmlFor="goal">Goals</Label>
                                 <Input className='w-72' type="email" id="email" placeholder="AWS Cloud Engineer" />
                             </div>  
                         </div>
