@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 const openaiURL = "https://api.openai.com/v1/chat/completions"
@@ -153,7 +155,9 @@ type TextInput struct {
 
 // Exported function: GenerateResumeHandler
 func GenerateResumeHandler(c *gin.Context) {
-	apiKey := ""
+	godotenv.Load()
+	apiKey := os.Getenv("OPENAI_API_KEY")
+
 	if apiKey == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "API key is missing"})
 		return

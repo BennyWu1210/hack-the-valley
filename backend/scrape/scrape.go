@@ -8,9 +8,11 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+    "os"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 // GPT Request/Response Structures
@@ -130,7 +132,8 @@ func getFullPageContent(url string) (string, error) {
 
 // Function to call GPT-4 to generate structured job data with fixed schema
 func getGPTResponse(jobContent string, link string) (map[string]interface{}, error) {
-	apiKey := "" // Replace with your actual OpenAI API key
+	godotenv.Load()
+    apiKey := os.Getenv("OPENAI_API_KEY")
 
 	if apiKey == "" {
 		return nil, fmt.Errorf("API key is missing")
@@ -198,14 +201,12 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 	// Unmarshal the response into a generic map
 	var gptResponse map[string]interface{}
 	err = json.Unmarshal(body, &gptResponse)
-    fmt.Println("1====", gptResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing response: %w", err)
 	}
 
 	// Extract the content from the GPT response
 	content, ok := gptResponse["choices"].([]interface{})
-    fmt.Println("2====", content)
 	if !ok || len(content) == 0 {
 		return nil, fmt.Errorf("no content found in GPT response")
 	}
@@ -222,7 +223,6 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 	}
 
 	contentText, ok := messageContent["content"].(string)
-    fmt.Println("3====", contentText)
 	if !ok {
 		return nil, fmt.Errorf("unexpected content format")
 	}
