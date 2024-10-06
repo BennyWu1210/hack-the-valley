@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react"; // TinyMCE editor
 import type { Editor as TinyMCEEditor } from "tinymce"; // Import TinyMCE types
 import ResumeUpload from "../../../components/ResumeUpload";
 import EditorSidebar from "../../../components/EditorSidebar";
-import { generateResume } from "../../../functions/generateResume";
-
+import { generateResume, fetchBlocks } from "../../../functions/generateResume";
 import { useGlobalContext } from "@/app/GlobalContext";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Params {
   id: string;
@@ -15,22 +17,32 @@ interface Params {
 
 const GeneratePage = ({ params }: { params: Params }) => {
   const { id } = params;
-  const editorRef = useRef<TinyMCEEditor | null>(null);
+  const editorRef = useRef<TinyMCEEditor | null>(null); // Correctly type the editorRef
   const { resumeList, setResumeList } = useGlobalContext();
+  const router = useRouter();
 
-  // Define section ordering state in the parent component
+  // Section order state
   const [items, setItems] = useState<string[]>(['Education', 'Experience', 'Projects', 'Skills']);
+  
+  // Loading and info state for fetched API data
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [info, setInfo] = useState<any>(null);
 
-  // Function to handle updates to the items order
-  const handleListUpdate = (newOrder: string[]) => {
-    setItems(newOrder);
-    console.log('Updated order in parent:', newOrder); // Log in the parent when the order changes
+  const scores = {
+    overallScore: 3,
+    contentAccuracy: 5,
+    creativity: 10,
+    organizationClarity: 7,
+    technicalSkills: 10,
   };
 
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
+  const handleGoBack = () => {
+    router.push('/'); // Navigates to the homepage
+  };
+
+  const handleListUpdate = (newOrder: string[]) => {
+    setItems(newOrder);
+    console.log("Updated order in parent:", newOrder);
   };
 
   const setEditorContent = (newContent: string) => {
@@ -41,138 +53,67 @@ const GeneratePage = ({ params }: { params: Params }) => {
 
   const genResume = () => {
     console.log("Generating resume");
-    const resumeString = generateResume(items);
+    const resumeString = generateResume(items, info.toString());
     console.log("Generated resume string: ", resumeString);
     setEditorContent(resumeString);
   };
 
-  const simulatePageBreaks = () => {
-    if (!editorRef.current) return;
-
-    const editor = editorRef.current;
-    const editorContent = editor.getBody();
-    const pageHeightPx = 1123; // A4 height in pixels
-    let accumulatedHeight = 0;
-
-    // Clear previous page breaks
-    const pageBreaks = editorContent.querySelectorAll(".page-break");
-    pageBreaks.forEach((breakEl) => breakEl.remove());
-
-    console.log("Simulating page breaks");
-
-    Array.from(editorContent.childNodes).forEach((node) => {
-      const nodeElement = node as HTMLElement;
-      accumulatedHeight += nodeElement.offsetHeight;
-
-      if (accumulatedHeight > pageHeightPx) {
-        const pageBreak = editor.getDoc().createElement("div");
-        pageBreak.className = "page-break";
-        pageBreak.style.borderTop = "1px dashed black";
-        pageBreak.style.margin = "40px 0";
-
-        editorContent.insertBefore(pageBreak, nodeElement);
-
-        accumulatedHeight = nodeElement.offsetHeight;
-      }
-    });
-  };
-
-  const handleEditorInit = (evt: any, editor: TinyMCEEditor) => {
-    editorRef.current = editor;
-
-    editor.on("keyup", () => {
-      console.log("Keyup detected");
-      simulatePageBreaks();
-    });
-
-    editor.on("change", () => {
-      console.log("Change detected");
-      simulatePageBreaks();
-    });
-
-    editor.on("NodeChange", () => {
-      console.log("Node change detected");
-      simulatePageBreaks();
-    });
-
-    simulatePageBreaks();
-  };
-
-  const exportToPDF = async () => {
-    if (editorRef.current) {
-      const content = editorRef.current.getContent();
-      const tempElement = document.createElement("div");
-      tempElement.innerHTML = content;
-  
-      const style = document.createElement("style");
-      style.textContent = `
-        @font-face {
-          font-family: 'Lato';
-          src: url('/fonts/Lato-Regular.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
-        }
-        body {
-          font-family: 'Lato', Helvetica, Arial, sans-serif;
-          font-size: 14px;
-          color: black;
-          line-height: 1.5;
-          padding: 25px;
-          margin: 0;
-        }
-        h1 {
-          font-size: 32px;
-          font-weight: 800;
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        strong {
-          letter-spacing: -0.4x;
-        }
-        p {
-          font-size: 14px;
-          margin: 0;
-          padding-bottom: 5px;
-          letter-spacing: -0.5px;
-        }
-        .page-break {
-          display: block;
-          page-break-before: always;
-          border-top: 1px dashed black;
-          margin: 40px 0;
-        }
-      `;
-      tempElement.appendChild(style);
-  
-      const html2pdf = (await import("html2pdf.js")).default;
-  
-      const opt = {
-        margin: 10,
-        filename: "document.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 3, logging: true, useCORS: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      };
-  
-      html2pdf().from(tempElement).set(opt).save();
-    }
-  };
-  
-  const getGlobal = () => {
-    console.log(resumeList[1].link);
-  }
-
   useEffect(() => {
-    // Call the scraper API here
-  }, []);
+    const resumeLink = resumeList[1].link;
+    console.log("Resume link:", resumeLink);
+    
+    const callScraperAPI = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/scrape", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            link: resumeLink,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        setInfo(data);
+        setIsLoading(false); // Set loading to false after data is fetched
+
+        // Now fetch the blocks after info has been set
+        fetchBlocks(data.toString())
+          .then((blocks) => {
+            // Once blocks are fetched, generate the resume
+            const resumeHtml = generateResume(items, blocks);
+            console.log('Generated Resume HTML:', resumeHtml);
+            if (editorRef.current) {
+              editorRef.current.setContent(resumeHtml); // Ensure editor is initialized before setting content
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching blocks:', error);
+          });
+
+      } catch (error) {
+        console.error("Error calling scraper API:", error);
+        setIsLoading(false); // Stop the loading spinner if an error occurs
+      }
+    };
+
+    callScraperAPI();
+  }, [resumeList]);
 
   return (
     <div className="flex flex-row">
-      <div className="basis-[70%] border border-green-500">
+      <div className="basis-[70%] flex justify-center items-start">
       <Editor
         apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
-        onInit={handleEditorInit}
-        initialValue="<p style='color: blue;'>This is the initial content of the editor.</p>"
+        onInit={(event) => {
+          editorRef.current = event.target as TinyMCEEditor; // Correctly assign the editor
+        }}
+        initialValue=""
         init={{
           height: "100vh",
           width: 700,
@@ -185,12 +126,6 @@ const GeneratePage = ({ params }: { params: Params }) => {
           toolbar: "undo redo | blocks fontfamily | bold italic forecolor | alignleft aligncenter " +
             "alignright alignjustify | bullist numlist outdent indent | removeformat | help | exportpdf",
           font_family_formats: "Lato=lato,sans-serif; Helvetica=helvetica,sans-serif; Arial=arial,sans-serif;",
-          setup: (editor) => {
-            editor.ui.registry.addButton("exportpdf", {
-              text: "Export PDF",
-              onAction: exportToPDF,
-            });
-          },
           content_style: `
             @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
             body { 
@@ -202,9 +137,10 @@ const GeneratePage = ({ params }: { params: Params }) => {
               box-sizing: border-box; 
               margin: 0;
               height: auto;
-              width: 700px;
-              overflow-y: scroll;
-              position: relative;
+              width: 100%; /* Ensure content area takes full width */
+              max-width: 700px; /* Optional: restrict maximum width */
+              overflow-x: hidden; /* Disable horizontal scrolling */
+              word-wrap: break-word; /* Wrap long content */
             }
             p, h1 {
               margin: 0;
@@ -220,16 +156,12 @@ const GeneratePage = ({ params }: { params: Params }) => {
         }}
       />
 
-        <button onClick={log}>Log editor content</button>
-        <button onClick={() => setEditorContent("<p>This is some new content!</p>")}>Set New Content</button>
-        <button onClick={genResume}>Generate Resume</button>
-        <button onClick={getGlobal}>Get Global</button>
-
-        <ResumeUpload />
+        <Button variant="outline" size="icon" className="absolute bottom-5 left-5" onClick={handleGoBack}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
       </div>
       <div className="basis-[30%]">
-        {/* Pass items and handleListUpdate to EditorSidebar */}
-        <EditorSidebar items={items} setItems={handleListUpdate} />
+        <EditorSidebar items={items} setItems={handleListUpdate} info={info} isLoading={isLoading} scores={scores} />
       </div>
     </div>
   );
