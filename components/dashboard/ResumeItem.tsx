@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Resume } from "@/utils/schema/ResumeSchema";
-import { randomUUID } from "crypto";
 
 export default function ResumeItem({ resume, addButton = false, addNewResume = (newItem: Resume) => { } }: { resume: Resume, addButton: boolean, addNewResume: (newItem: Resume) => void }) {
   const [newResume, setNewResume] = useState<Resume>({ id: crypto.randomUUID(), name: "", date: new Date(), link: "" });
