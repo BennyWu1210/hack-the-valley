@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react"; // TinyMCE editor
 import type { Editor as TinyMCEEditor } from "tinymce"; // Import TinyMCE types
 import ResumeUpload from "../../../components/ResumeUpload";
 import EditorSidebar from "../../../components/EditorSidebar";
 import { generateResume } from "../../../functions/generateResume";
+
+import { useGlobalContext } from "@/app/GlobalContext";
 
 interface Params {
   id: string;
@@ -14,6 +16,7 @@ interface Params {
 const GeneratePage = ({ params }: { params: Params }) => {
   const { id } = params;
   const editorRef = useRef<TinyMCEEditor | null>(null);
+  const { resumeList, setResumeList } = useGlobalContext();
 
   // Define section ordering state in the parent component
   const [items, setItems] = useState<string[]>(['Education', 'Experience', 'Projects', 'Skills']);
@@ -101,7 +104,6 @@ const GeneratePage = ({ params }: { params: Params }) => {
       const tempElement = document.createElement("div");
       tempElement.innerHTML = content;
   
-      // Add embedded font using Base64 (replace with your own Base64 font)
       const style = document.createElement("style");
       style.textContent = `
         @font-face {
@@ -142,7 +144,6 @@ const GeneratePage = ({ params }: { params: Params }) => {
       `;
       tempElement.appendChild(style);
   
-      // Import and configure html2pdf
       const html2pdf = (await import("html2pdf.js")).default;
   
       const opt = {
@@ -153,11 +154,17 @@ const GeneratePage = ({ params }: { params: Params }) => {
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       };
   
-      // Generate and save the PDF
       html2pdf().from(tempElement).set(opt).save();
     }
   };
   
+  const getGlobal = () => {
+    console.log(resumeList[1].link);
+  }
+
+  useEffect(() => {
+    // Call the scraper API here
+  }, []);
 
   return (
     <div className="flex flex-row">
@@ -216,6 +223,8 @@ const GeneratePage = ({ params }: { params: Params }) => {
         <button onClick={log}>Log editor content</button>
         <button onClick={() => setEditorContent("<p>This is some new content!</p>")}>Set New Content</button>
         <button onClick={genResume}>Generate Resume</button>
+        <button onClick={getGlobal}>Get Global</button>
+
         <ResumeUpload />
       </div>
       <div className="basis-[30%]">
