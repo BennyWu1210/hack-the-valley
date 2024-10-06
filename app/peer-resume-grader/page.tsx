@@ -30,7 +30,7 @@ export const description =
 
 export default function Page() {
 
-  const [resumeList, setResumeList] = useState<Resume[]>([{id: "Meta SWE", name: "Meta SWE", owner: "John", date: new Date(Date.now())}]); // TODO: should be global context later???? 
+  const [resumeList, setResumeList] = useState<Resume[]>([]); // TODO: should be global context later???? 
 
   const addNewResume = (newItem: Resume) => {
     setResumeList(prev => [...prev, newItem]);
