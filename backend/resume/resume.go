@@ -3,6 +3,7 @@ package resume
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -152,7 +153,7 @@ type TextInput struct {
 
 // Exported function: GenerateResumeHandler
 func GenerateResumeHandler(c *gin.Context) {
-	apiKey := "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"
+	apiKey := "key"
 	if apiKey == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "API key is missing"})
 		return
@@ -279,6 +280,7 @@ func GenerateResumeHandler(c *gin.Context) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	fmt.Println("====", resp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error sending request to OpenAI"})
 		return
