@@ -40,13 +40,13 @@ export const description =
 
 export default function Dashboard() {
   const { resumeList, setResumeList } = useGlobalContext();
+  const { masterResumeText, setMasterResumeText } = useGlobalContext();
 
   const addNewResume = (newItem: Resume) => {
     setResumeList([...resumeList, newItem]);
   }
 
-  const addButton: Resume = { id: "Add button", name: "Add button", date: new Date(Date.now()), link: ""}
-
+  const addButton: Resume = { id: "Add button", name: "Add button", date: new Date(Date.now()), link: ""}  
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[260px_1fr] lg:grid-cols-[320px_1fr]">
       <Nav />

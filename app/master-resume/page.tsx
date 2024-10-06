@@ -17,27 +17,65 @@ import { CircleUser } from "lucide-react";
 import { useRef, useState } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import pdfToText from "react-pdftotext";
+import { useGlobalContext } from "../GlobalContext";
 
 export const description =
   "Resume Dashbaord"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
+
+
+
 export default function MasterResume() {
-  const [file, setFile] = useState<File | null>(null);
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const {masterResume, setMasterResume} = useGlobalContext();
+  const {masterResumeText, setMasterResumeText} = useGlobalContext();
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
   }
 
+  // Define a function to handle the file upload and text extraction
+  const extractText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]; // Optional chaining to handle cases when no file is selected
+    if (file) {
+      pdfToText(file)
+        .then((text) => {
+          console.log("Original Extracted Text:", text);
+
+          // Clean the extracted text to make it JSON-safe
+          const cleanedText = cleanTextForJSON(text);
+
+          // Log the cleaned text
+          console.log("Cleaned Text:", cleanedText);
+
+          // Here, you could also further process or pass the cleaned text as needed
+          setMasterResumeText(cleanedText);
+        })
+        .catch((error) => console.error("Failed to extract text from PDF", error));
+    } else {
+      console.error("No file selected");
+    }
+  };
+
+  // Define the function to clean the extracted text
+  const cleanTextForJSON = (text: string): string => {
+    // Replace problematic characters such as newlines, tabs, and non-printable characters
+    return text
+      .replace(/[\r\n\t]+/g, " ") // Replace newlines and tabs with spaces
+      .replace(/[^\x20-\x7E]/g, "") // Remove non-ASCII characters
+      .trim(); // Trim leading and trailing whitespace
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
     if (selectedFile && selectedFile.type === 'application/pdf') {
-      setFile(selectedFile);
+      setMasterResume(selectedFile);
+      extractText(event);
     } else {
       alert("Please upload a valid PDF file.");
     }
@@ -82,7 +120,7 @@ export default function MasterResume() {
             className="flex flex-1 rounded-lg border border-dashed overflow-y-scroll shadow-sm" x-chunk="dashboard-02-chunk-1"
           >
             {
-              !file ?
+              !masterResume ?
                 <div
                   className="flex flex-col flex-1 items-center justify-center" x-chunk="dashboard-02-chunk-1"
                 >
@@ -101,7 +139,7 @@ export default function MasterResume() {
                   />
                 </div> :
                 <>
-                  <Document className="pl-8" file={file} onLoadSuccess={onDocumentLoadSuccess}>
+                  <Document className="pl-8" file={masterResume} onLoadSuccess={onDocumentLoadSuccess}>
                     <Page height={700} pageNumber={pageNumber} />
                   </Document>
                   <div className="p-5 gap-2">
