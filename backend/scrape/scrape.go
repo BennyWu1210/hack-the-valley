@@ -50,6 +50,7 @@ type JobSchema struct {
 	JobDescription  Property         `json:"job_description"`
 	Requirements    ArrayProperty    `json:"requirements"`
 	Salary          Property         `json:"salary"`
+	Location        Property         `json:"location"`
 }
 
 // Property defines the type for string fields
@@ -162,6 +163,7 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 						JobDescription:  Property{Type: "string"},
 						Requirements:    ArrayProperty{Type: "array", Items: Property{Type: "string"}}, // Array of strings
 						Salary:          Property{Type: "string"},
+						Location:        Property{Type: "string"},
 					},
 					Required: []string{"application_link", "job_title", "company", "job_description", "requirements", "salary"},
 				},
