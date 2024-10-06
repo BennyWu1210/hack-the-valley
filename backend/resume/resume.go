@@ -153,7 +153,7 @@ type TextInput struct {
 
 // Exported function: GenerateResumeHandler
 func GenerateResumeHandler(c *gin.Context) {
-	apiKey := "key"
+	apiKey := ""
 	if apiKey == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "API key is missing"})
 		return

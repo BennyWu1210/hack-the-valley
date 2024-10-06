@@ -15,8 +15,8 @@ import (
 
 // GPT Request/Response Structures
 type GPT4Request struct {
-	Model          string         `json:"model"`
-	Messages       []Message      `json:"messages"`
+	Model          string        `json:"model"`
+	Messages       []Message     `json:"messages"`
 	ResponseFormat ResponseFormat `json:"response_format"`
 }
 
@@ -36,22 +36,29 @@ type JSONSchema struct {
 }
 
 type Schema struct {
-	Type       string    `json:"type"`
+	Type       string   `json:"type"`
 	Properties JobSchema `json:"properties"`
-	Required   []string  `json:"required"`
+	Required   []string `json:"required"`
 }
 
 type JobSchema struct {
-	ApplicationLink Property `json:"application_link"`
-	JobTitle        Property `json:"job_title"`
-	Company         Property `json:"company"`
-	JobDescription  Property `json:"job_description"`
-	Requirements    Property `json:"requirements"`
-	Salary          Property `json:"salary"`
+	ApplicationLink Property         `json:"application_link"`
+	JobTitle        Property         `json:"job_title"`
+	Company         Property         `json:"company"`
+	JobDescription  Property         `json:"job_description"`
+	Requirements    ArrayProperty    `json:"requirements"`
+	Salary          Property         `json:"salary"`
 }
 
+// Property defines the type for string fields
 type Property struct {
 	Type string `json:"type"`
+}
+
+// ArrayProperty defines the type for array fields with string items
+type ArrayProperty struct {
+	Type  string `json:"type"`
+	Items Property `json:"items"`
 }
 
 // JobLinkRequest captures the input link
@@ -132,10 +139,10 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 	// Prepare the GPT-4 messages
 	messages := []Message{
 		{Role: "system", Content: "You are an assistant that extracts job posting details in structured format."},
-		{Role: "user", Content: fmt.Sprintf("Please extract the following information from this job description and structure it in the following JSON schema: application_link, job_title, company, job_description, requirements, salary. Job content: %s"+link, jobContent)},
+		{Role: "user", Content: fmt.Sprintf("Please extract the following information from this job description (under 75 word) and structure it in the following JSON schema: application_link, job_title, company, job_description, requirements as an array, salary. Job content: %s" + link, jobContent)},
 	}
 
-	// Define the schema for the expected response
+	// Define the schema for the expected response, with `requirements` as an array of strings
 	reqBody := GPT4Request{
 		Model:    "gpt-4o-2024-08-06",
 		Messages: messages,
@@ -150,7 +157,7 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 						JobTitle:        Property{Type: "string"},
 						Company:         Property{Type: "string"},
 						JobDescription:  Property{Type: "string"},
-						Requirements:    Property{Type: "string"},
+						Requirements:    ArrayProperty{Type: "array", Items: Property{Type: "string"}}, // Array of strings
 						Salary:          Property{Type: "string"},
 					},
 					Required: []string{"application_link", "job_title", "company", "job_description", "requirements", "salary"},
@@ -191,14 +198,14 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 	// Unmarshal the response into a generic map
 	var gptResponse map[string]interface{}
 	err = json.Unmarshal(body, &gptResponse)
+    fmt.Println("1====", gptResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing response: %w", err)
 	}
-	fmt.Println("6======", gptResponse)
 
 	// Extract the content from the GPT response
 	content, ok := gptResponse["choices"].([]interface{})
-	fmt.Println("7======", content)
+    fmt.Println("2====", content)
 	if !ok || len(content) == 0 {
 		return nil, fmt.Errorf("no content found in GPT response")
 	}
@@ -210,13 +217,12 @@ func getGPTResponse(jobContent string, link string) (map[string]interface{}, err
 	}
 
 	messageContent, ok := message["message"].(map[string]interface{})
-	fmt.Println("8======", messageContent)
 	if !ok {
 		return nil, fmt.Errorf("unexpected message format")
 	}
 
 	contentText, ok := messageContent["content"].(string)
-	fmt.Println("9======", contentText)
+    fmt.Println("3====", contentText)
 	if !ok {
 		return nil, fmt.Errorf("unexpected content format")
 	}
