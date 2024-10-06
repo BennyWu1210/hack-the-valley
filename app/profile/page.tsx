@@ -1,7 +1,7 @@
  "use client"
 
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Card,
     CardContent,
@@ -66,6 +66,11 @@ const chartConfig = {
 import { useGlobalContext } from "@/app/GlobalContext";
 
 
+import Confetti from 'react-confetti';
+// import { Button } from "@/components/ui/button"; // Assuming you are using Shadcn's Button component
+
+
+
 const Achievements = ({title, description, progress, level}) => {
     return (
         <Card className="w-full flex-1 p-8 flex flex-row gap-8">
@@ -84,6 +89,33 @@ const Achievements = ({title, description, progress, level}) => {
 }
 
 const page = () => {
+    // CONFETTI
+    const [isConfettiVisible, setIsConfettiVisible] = useState(false);
+  const [opacity, setOpacity] = useState(1);
+
+  const handleConfetti = () => {
+    setIsConfettiVisible(true);
+    setOpacity(1); // Reset opacity to 1 initially
+
+    // Start reducing opacity after 2 seconds
+    setTimeout(() => {
+      const fadeInterval = setInterval(() => {
+        setOpacity((prev) => {
+          if (prev > 0.1) {
+            return prev - 0.1; // Gradually reduce opacity
+          } else {
+            clearInterval(fadeInterval); // Stop reducing opacity after it reaches 0
+            setIsConfettiVisible(false); // Hide confetti when opacity reaches 0
+            return 0;
+          }
+        });
+      }, 100); // Reduce opacity every 300ms (roughly 3 seconds for full fade)
+    }, 4000); // Start fading after 2 seconds
+  };
+
+
+
+
     const [progress, setProgress] = React.useState(13)
 
     const {user, setUser} = useGlobalContext();
@@ -244,6 +276,25 @@ const page = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* CONFETTI */}
+                        {/* Button to trigger confetti */}
+      <Button variant="secondary" onClick={handleConfetti}>
+        Celebrate!
+      </Button>
+
+      {/* Confetti animation with opacity fade */}
+      {isConfettiVisible && (
+        <div style={{ opacity: opacity, transition: 'opacity 0.3s ease' }}>
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            numberOfPieces={200}
+            gravity={1} // Faster fall
+            colors={['#FFC107', '#FF5722', '#00BCD4', '#4CAF50']}
+          />
+        </div>
+      )}
 
                     </TabsContent>
 
