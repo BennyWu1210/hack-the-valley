@@ -19,6 +19,8 @@ const GeneratePage = ({ params }: { params: Params }) => {
   const { id } = params;
   const editorRef = useRef<TinyMCEEditor | null>(null); // Correctly type the editorRef
   const { resumeList, setResumeList } = useGlobalContext();
+  const { masterResumeText, setMasterResumeText } = useGlobalContext();
+
   const router = useRouter();
 
   // Section order state
@@ -59,6 +61,7 @@ const GeneratePage = ({ params }: { params: Params }) => {
   };
 
   useEffect(() => {
+    console.log("Master text:", masterResumeText);
     const resumeLink = resumeList[1].link;
     console.log("Resume link:", resumeLink);
     
@@ -83,7 +86,7 @@ const GeneratePage = ({ params }: { params: Params }) => {
         setIsLoading(false); // Set loading to false after data is fetched
 
         // Now fetch the blocks after info has been set
-        fetchBlocks(data.toString())
+        fetchBlocks(masterResumeText, data.toString())
           .then((blocks) => {
             // Once blocks are fetched, generate the resume
             const resumeHtml = generateResume(items, blocks);

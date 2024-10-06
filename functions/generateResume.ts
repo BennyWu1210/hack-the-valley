@@ -61,7 +61,7 @@ function generateEducation(content: Education[]) {
 }
 
 function generateExperience(content: Experience[]) {
-  const header = `<p style="text-align: left;"><span style="color: ${accentColor};"><strong>Experience ________________________________________________________________________________________________________</strong></span></p>`;
+  const header = `<p style="text-align: left;"><span style="color: ${accentColor};"><strong>Experience _______________________________________________________________________________________________________</strong></span></p>`;
 
   const formatDescription = (description: string) => {
     const bulletPoints = description.split(/(?: - |•|\n)/).filter(point => point.trim() !== '');
@@ -131,7 +131,7 @@ export function generateResume(sectionOrder: string[], blocks: Blocks): string {
 }
 
 // Function to fetch the blocks
-export async function fetchBlocks(jobDescription: string): Promise<Blocks> {
+export async function fetchBlocks(resume: string, jobDescription: string): Promise<Blocks> {
   try {
     const response = await fetch("http://localhost:8080/blocks", {
       method: "POST",
@@ -140,7 +140,7 @@ export async function fetchBlocks(jobDescription: string): Promise<Blocks> {
       },
       body: JSON.stringify({
         "job_description": jobDescription,
-        "resume": "resume",
+        "resume": resume,
       }),
     });
 
