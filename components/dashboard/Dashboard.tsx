@@ -39,19 +39,14 @@ export const description = "Resume Dashbaord";
 export default function Dashboard() {
   const router = useRouter(); // using next/navigation
   const { resumeList, setResumeList } = useGlobalContext();
+  const { masterResumeText, setMasterResumeText } = useGlobalContext();
 
   const addNewResume = (newItem: Resume) => {
     setResumeList([...resumeList, newItem]);
     if (newItem.id != "Add button") router.push("/generate/1");
   };
 
-  const addButton: Resume = {
-    id: "Add button",
-    name: "Add button",
-    date: new Date(Date.now()),
-    link: "",
-  };
-
+  const addButton: Resume = { id: "Add button", name: "Add button", date: new Date(Date.now()), link: ""}  
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[260px_1fr] lg:grid-cols-[320px_1fr]">
       <Nav />

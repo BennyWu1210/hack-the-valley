@@ -16,6 +16,10 @@ interface GlobalContextType {
   setResumeList: (resumes: Resume[]) => void;
   achievements: string[];
   setAchievements: (achievements: string[]) => void;
+  masterResumeText: string;
+  setMasterResumeText: (text: string) => void;
+  masterResume: File | null;
+  setMasterResume: (file: File) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -24,9 +28,12 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [resumeList, setResumeList] = useState<Resume[]>([]);
   const [achievements, setAchievements] = useState<string[]>([]);
+  const [masterResume, setMasterResume] = useState<File | null>(null);
+  const [masterResumeText, setMasterResumeText] = useState<string>("");
+  
 
   return (
-    <GlobalContext.Provider value={{ user, setUser, resumeList, setResumeList, achievements, setAchievements }}>
+    <GlobalContext.Provider value={{ user, setUser, resumeList, setResumeList, achievements, setAchievements, masterResume, setMasterResume, masterResumeText, setMasterResumeText }}>
       {children}
     </GlobalContext.Provider>
   );
