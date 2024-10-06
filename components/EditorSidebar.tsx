@@ -3,6 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadialChart } from "@/components/RadialChart";
 import DraggableList from "./DraggableList";
+import { Button } from "@/components/ui/button"
+import { Sparkles } from "lucide-react";
 
 interface Info {
   job_title: string;
@@ -28,6 +30,7 @@ interface EditorSidebarProps {
   info: Info | null;
   isLoading: boolean;
   scores: Scores;
+  handleRegenerate: () => void;
 }
 
 export default function EditorSidebar({
@@ -36,6 +39,7 @@ export default function EditorSidebar({
   info,
   isLoading,
   scores,
+  handleRegenerate
 }: EditorSidebarProps) {
   const handleListUpdate = (newOrder: string[]) => {
     setItems(newOrder);
@@ -104,7 +108,7 @@ export default function EditorSidebar({
 
           <div className="pb-5">
             <h1>Requirements</h1>
-            {/* {isLoading ? (
+            {isLoading ? (
               <>
                 <Skeleton className="h-5 w-1/2 mb-4 bg-slate-300" />
                 <Skeleton className="h-5 w-1/4 mb-4 bg-slate-300" />
@@ -115,7 +119,7 @@ export default function EditorSidebar({
                   <li key={index}>{requirement}</li>
                 ))}
               </ul>
-            )} */}
+            )}
           </div>
 
           <div className="pb-5">
@@ -140,6 +144,9 @@ export default function EditorSidebar({
         <TabsContent value="edit">
           <h1 className="mb-2 pt-2">Resume Sections</h1>
           <DraggableList items={items} setItems={handleListUpdate} />
+          <Button className="mt-2" onClick={handleRegenerate}>
+            <Sparkles className="mr-2 h-4 w-4" /> Regenerate
+          </Button>
         </TabsContent>
 
         <TabsContent value="evaluate">

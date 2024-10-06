@@ -1,3 +1,5 @@
+import { Editor as TinyMCEEditor } from 'tinymce';
+
 const accentColor = '#169179';
 
 // Interfaces
@@ -100,35 +102,71 @@ function generateSkills(programinglanguages: string[], technologies: string[]) {
 <p style="text-align: left;"><span style="color: #000000;"><strong>Technologies:</strong> ${technologies.join(", ")}</span></p>`;
 }
 
-// Main function to generate the resume string
-export function generateResume(sectionOrder: string[], blocks: Blocks): string {
-  let resume = generateHeader(blocks.contact_information) + '\n\n';
+// Helper function to generate a random delay
+function randomDelay(min: number = 1000, max: number = 1500) {
+  return new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (max - min + 1)) + min));
+}
 
-  sectionOrder.forEach((section) => {
+// Main function to generate the resume string with random delay before each section
+// Main function to generate the resume string with random delay before each section
+export async function generateResume(
+  sectionOrder: string[],
+  blocks: Blocks,
+  setLoadingState: (state: string) => void,
+  editorRef: React.RefObject<TinyMCEEditor>
+): Promise<void> {
+  setLoadingState("Generating header...");
+
+  // Generate and write the header first
+  let resume = generateHeader(blocks.contact_information) + '\n\n';
+  if (editorRef.current) {
+    editorRef.current.setContent(resume);  // Write initial content (header)
+  }
+
+  for (const section of sectionOrder) {
+    // Add a random delay between 500ms and 1000ms before generating each section
+    await randomDelay();
+
+    let sectionContent = "";
+
     switch (section.toLowerCase()) {
       case 'education':
-        resume += generateEducation(blocks.education) + '\n\n';
+        setLoadingState("Generating education section...");
+        sectionContent = generateEducation(blocks.education) + '\n\n';
         break;
       case 'experience':
-        resume += generateExperience(blocks.experience) + '\n\n';
+        setLoadingState("Generating experience section...");
+        sectionContent = generateExperience(blocks.experience) + '\n\n';
         break;
       case 'projects':
-        resume += generateProjects(blocks.projects.slice(0, 2)) + '\n\n';
+        setLoadingState("Generating projects section...");
+        sectionContent = generateProjects(blocks.projects.slice(0, 2)) + '\n\n';
         break;
       case 'skills':
-        resume += generateSkills(blocks.programinglanguages, blocks.technologies) + '\n\n';
+        setLoadingState("Generating skills section...");
+        sectionContent = generateSkills(blocks.programinglanguages, blocks.technologies) + '\n\n';
         break;
       case 'summary':
-        resume += blocks.professional_summary + '\n\n';
+        setLoadingState("Generating summary...");
+        sectionContent = blocks.professional_summary + '\n\n';
         break;
       default:
-        resume += `Unknown section: ${section}` + '\n\n';
+        setLoadingState("Unknown section found...");
+        sectionContent = `Unknown section: ${section}` + '\n\n';
         break;
     }
-  });
 
-  return resume;
+    // Append the generated section content to the editor
+    if (editorRef.current) {
+      const currentContent = editorRef.current.getContent();  // Get existing content in the editor
+      editorRef.current.setContent(currentContent + sectionContent);  // Append new section content
+    }
+  }
+
+  setLoadingState(""); // Resume generation complete
 }
+
+
 
 // Function to fetch the blocks
 export async function fetchBlocks(resume: string, jobDescription: string): Promise<Blocks> {
