@@ -38,13 +38,14 @@ export const description =
   "Resume Dashbaord"
 
 
-
 export default function Dashboard() {
   const { resumeList, setResumeList } = useGlobalContext();
 
   const addNewResume = (newItem: Resume) => {
     setResumeList([...resumeList, newItem]);
   }
+
+  const addButton: Resume = { id: "Add button", name: "Add button", date: new Date(Date.now()), link: ""}
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[260px_1fr] lg:grid-cols-[320px_1fr]">
@@ -91,8 +92,7 @@ export default function Dashboard() {
 
             {resumeList.length > 0 ?
               <div className="w-full p-8 grid gap-2 grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
-                <ResumeItem key={"Add button"} resume={{ id: "Add button", name: "Add button", date: new Date(Date.now()) }} addButton={true} addNewResume={addNewResume} />
-                {resumeList.map((resume) => (<ResumeItem key={resume.id} resume={resume} addButton={false} addNewResume={(resume: Resume) => { }} />))}
+                {resumeList.map((resume) => (<ResumeItem key={resume.id} resume={resume} addButton={resume.id === "Add button"} addNewResume={addNewResume} />))}
               </div>
               :
               <div
@@ -104,10 +104,9 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground">
                   Create your first resume to get started
                 </p>
-                <Button className="mt-4" onClick={() => addNewResume({ id: "resume " + (resumeList.length + 1), name: "New Resume!", date: new Date(Date.now()) })}>Create New</Button>
+                <Button className="mt-4" onClick={() => addNewResume(addButton)}>Get Started</Button>
               </div>
             }
-
 
           </div>
         </main>
