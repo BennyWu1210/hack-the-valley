@@ -47,17 +47,17 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { month: "Communication", desktop: 186 },
-  { month: "Teamwork", desktop: 305 },
-  { month: "Problem-solving", desktop: 237 },
-  { month: "Adaptability", desktop: 273 },
-  { month: "Time Management", desktop: 209 },
-  { month: "Leadership", desktop: 214 },
+  { skill: "Communication", score: 5 },
+  { skill: "Teamwork", score: 5 },
+  { skill: "Problem-solving", score: 5 },
+  { skill: "Adaptability", score: 5 },
+  { skill: "Time Management", score: 5 },
+  { skill: "Leadership", score: 5 },
 ]
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  score: {
+    label: "score",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
@@ -89,6 +89,7 @@ const page = () => {
     const {user, setUser} = useGlobalContext();
     const [nameInput, setNameInput] = React.useState(user?.name || '');
     const [emailInput, setEmailInput] = React.useState(user?.email || '');
+    const [goalInput, setGoalInput] = React.useState(user?.goal || '');
   
 
     // Handle input change for name
@@ -101,6 +102,11 @@ const page = () => {
     setEmailInput(e.target.value);
   };
 
+  // Handle input change for email
+  const handleGoalChange = (e) => {
+    setGoalInput(e.target.value);
+  };
+
   // Update user when "Enter" is pressed
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -108,6 +114,7 @@ const page = () => {
         id: user?.id || '',  // Preserve the id or provide a default value
         name: nameInput,
         email: emailInput,
+        goal: goalInput,
       });
     }
   };
@@ -156,9 +163,9 @@ const page = () => {
                         </div>
                         <div className='flex flex-col justify-center gap-2'>
                             <CardTitle className='text-4xl'>{user?.name || 'Guest'}</CardTitle>
-                            <CardDescription>AWS Cloud Engineer</CardDescription>
+                            <CardDescription>{user?.goal || ""}</CardDescription>
                             <Separator/>
-                            <div className='border rounded-sm w-fit px-4 py-1'>2540 XP</div>
+                            <div className='border rounded-sm w-fit px-4 py-1'>0 XP</div>
                         </div>
                     </Card>
 
@@ -173,10 +180,10 @@ const page = () => {
                                     >
                                     <RadarChart data={chartData}>
                                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                        <PolarAngleAxis dataKey="month" />
+                                        <PolarAngleAxis dataKey="skill" />
                                         <PolarGrid />
                                         <Radar
-                                        dataKey="desktop"
+                                        dataKey="score"
                                         fill="var(--color-desktop)"
                                         fillOpacity={0.6}
                                         />
@@ -225,9 +232,17 @@ const page = () => {
                             </div>
 
                             <div className="grid w-96 items-center gap-1.5">
-                                <Label htmlFor="goal">Goals</Label>
-                                <Input className='w-72' type="email" id="email" placeholder="AWS Cloud Engineer" />
-                            </div>  
+                                <Label htmlFor="goal">Goal</Label>
+                                <Input
+                                className="w-72"
+                                type="text"
+                                id="goal"
+                                value={goalInput}
+                                onChange={handleGoalChange}
+                                onKeyDown={handleKeyPress}
+                                placeholder={user?.goal || "Set a goal"}
+                                />
+                            </div>
                         </div>
 
                     </TabsContent>
