@@ -57,10 +57,11 @@ type ContactInfoSchema struct {
 }
 
 type ContactInfo struct {
-	Name    Property `json:"name"`
-	Email   Property `json:"email"`
-	Phone   Property `json:"phone"`
-	Address Property `json:"address"`
+	Name     Property `json:"name"`
+	Email    Property `json:"email"`
+	Website  Property `json:"website"`
+	GitHub   Property `json:"github"`
+	LinkedIn Property `json:"linkedin"`
 }
 
 type ExperienceSchema struct {
@@ -77,6 +78,7 @@ type Experience struct {
 type JobDetail struct {
 	JobTitle    Property `json:"job_title"`
 	Company     Property `json:"company"`
+	Location    Property `json:"location"` // Added location field
 	StartDate   Property `json:"start_date"`
 	EndDate     Property `json:"end_date"`
 	Description Property `json:"description"`
@@ -96,13 +98,14 @@ type Education struct {
 type DegreeInfo struct {
 	Degree         Property `json:"degree"`
 	Institution    Property `json:"institution"`
+	StartingYear   Property `json:"starting_year"` // Added starting year field
 	GraduationYear Property `json:"graduation_year"`
 	Description    Property `json:"description"`
 }
 
 type ProjectsSchema struct {
-	Type  string   `json:"type"`
-	Items Project  `json:"items"`
+	Type  string  `json:"type"`
+	Items Project `json:"items"`
 }
 
 type Project struct {
@@ -112,11 +115,11 @@ type Project struct {
 }
 
 type ProjectProps struct {
-	ProjectName      Property   `json:"project_name"`
-	Description      Property   `json:"description"`
+	ProjectName      Property           `json:"project_name"`
+	Description      Property           `json:"description"`
 	TechnologiesUsed TechnologiesSchema `json:"technologies_used"`
-	StartDate        Property   `json:"start_date"`
-	EndDate          Property   `json:"end_date"`
+	StartDate        Property           `json:"start_date"`
+	EndDate          Property           `json:"end_date"`
 }
 
 type LanguagesSchema struct {
@@ -144,7 +147,7 @@ type GPT4Response struct {
 // Request struct to capture the resume string passed in the POST request
 type TextInput struct {
 	JobDescription string `json:"job_description"`
-	Resume string `json:"resume"`
+	Resume         string `json:"resume"`
 }
 
 // Exported function: GenerateResumeHandler
@@ -164,8 +167,8 @@ func GenerateResumeHandler(c *gin.Context) {
 
 	// Create the GPT-4 message with the provided resume content
 	messages := []Message{
-		{Role: "system", Content: "You are a helpful assistant who generates structured resumes."},
-		{Role: "user", Content: "Please generate a structured resume from the following input that is most relavent to the job description\n\nResume:" + input.Resume + "\n\njob description:" + input.JobDescription},
+		{Role: "system", Content: "You are a helpful assistant who generates structured resumes. Wrap the text that is most relevant to the job description with <strong></strong> tag. Description should all be in bullet point formate"},
+		{Role: "user", Content: "Please generate a structured resume from the following input that is most relevant to the job description\n\nResume:" + input.Resume + "\n\njob description:" + input.JobDescription},
 	}
 
 	// Define the schema for the expected response
@@ -175,19 +178,20 @@ func GenerateResumeHandler(c *gin.Context) {
 		ResponseFormat: ResponseFormat{
 			Type: "json_schema",
 			JSONSchema: JSONSchema{
-				Name:   "resume_response",
+				Name: "resume_response",
 				Schema: Schema{
 					Type: "object",
 					Properties: ResumeStructure{
 						ContactInformation: ContactInfoSchema{
 							Type: "object",
 							Properties: ContactInfo{
-								Name:    Property{Type: "string"},
-								Email:   Property{Type: "string"},
-								Phone:   Property{Type: "string"},
-								Address: Property{Type: "string"},
+								Name:     Property{Type: "string"},
+								Email:    Property{Type: "string"},
+								Website:  Property{Type: "string"}, // Added website field
+								GitHub:   Property{Type: "string"}, // Added GitHub field
+								LinkedIn: Property{Type: "string"}, // Added LinkedIn field
 							},
-							Required: []string{"name", "email", "phone", "address"},
+							Required: []string{"name", "email", "website", "github", "linkedin"},
 						},
 						ProfessionalSummary: Property{Type: "string"},
 						Experience: ExperienceSchema{
@@ -197,11 +201,12 @@ func GenerateResumeHandler(c *gin.Context) {
 								Properties: JobDetail{
 									JobTitle:    Property{Type: "string"},
 									Company:     Property{Type: "string"},
+									Location:    Property{Type: "string"}, // Added location field
 									StartDate:   Property{Type: "string"},
 									EndDate:     Property{Type: "string"},
 									Description: Property{Type: "string"},
 								},
-								Required: []string{"job_title", "company", "start_date", "description"},
+								Required: []string{"job_title", "company", "location", "start_date", "description"},
 							},
 						},
 						Education: EducationSchema{
@@ -211,10 +216,11 @@ func GenerateResumeHandler(c *gin.Context) {
 								Properties: DegreeInfo{
 									Degree:         Property{Type: "string"},
 									Institution:    Property{Type: "string"},
+									StartingYear:   Property{Type: "string"}, // Added starting year field
 									GraduationYear: Property{Type: "string"},
 									Description:    Property{Type: "string"},
 								},
-								Required: []string{"degree", "institution", "graduation_year"},
+								Required: []string{"degree", "institution", "starting_year", "graduation_year"},
 							},
 						},
 						Projects: ProjectsSchema{
@@ -222,8 +228,8 @@ func GenerateResumeHandler(c *gin.Context) {
 							Items: Project{
 								Type: "object",
 								Properties: ProjectProps{
-									ProjectName:      Property{Type: "string"},
-									Description:      Property{Type: "string"},
+									ProjectName: Property{Type: "string"},
+									Description: Property{Type: "string"},
 									TechnologiesUsed: TechnologiesSchema{
 										Type: "array",
 										Items: Property{
