@@ -26,6 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        {/* You can add more meta tags here if needed */}
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <GlobalProvider>
           {children}
