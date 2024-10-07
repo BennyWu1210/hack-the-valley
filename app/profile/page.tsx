@@ -47,18 +47,18 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { skill: "Communication", score: 5 },
+  { skill: "Communication", score: 4 },
   { skill: "Teamwork", score: 5 },
-  { skill: "Problem-solving", score: 5 },
-  { skill: "Adaptability", score: 5 },
-  { skill: "Time Management", score: 5 },
-  { skill: "Leadership", score: 5 },
+  { skill: "Problem-solving", score: 7 },
+  { skill: "Adaptability", score: 2 },
+  { skill: "Time Management", score: 6 },
+  { skill: "Leadership", score: 7 },
 ]
 
 const chartConfig = {
   score: {
     label: "score",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig
 
@@ -190,21 +190,22 @@ const page = () => {
                 {/* Cards */}
                 <div className="flex w-full gap-4">
                     <Card className='w-fit flex-1 flex gap-8 py-4 px-8'>
-                        <div className="rounded-full bg-slate-100 aspect-square h-full">
-                            <CircleUser className="w-full h-full aspect-square" />
-                        </div>
+                        {/* <div className="rounded-full bg-slate-100 aspect-square h-full"> */}
+                            {/* <CircleUser className="w-full h-full aspect-square" /> */}
+                            <img src="/images/danny.jpeg" alt="grip" style={{ width: '230px', height: '230px', borderRadius: '100%', }} />
+                        {/* </div> */}
                         <div className='flex flex-col justify-center gap-2'>
-                            <CardTitle className='text-4xl'>{user?.name || 'Guest'}</CardTitle>
-                            <CardDescription>{user?.goal || ""}</CardDescription>
+                            <CardTitle className='text-4xl'>{user?.name || 'Dan the Man'}</CardTitle>
+                            <CardDescription>{user?.goal || "Professional Rizzler"}</CardDescription>
                             <Separator/>
-                            <div className='border rounded-sm w-fit px-4 py-1'>0 XP</div>
+                            <div className='border rounded-sm w-fit px-4 py-1'>3430 XP</div>
                         </div>
                     </Card>
 
 
-                    <Card>
-                        <CardContent className="pb-0">
-                            <div className='flex flex-1 flex-row min-w-[300px] items-center gap-4'>
+                    <Card className='flex items-center'>
+                        <CardContent className="pb-0 flex items-center">
+                            <div className='flex flex-1 flex-row min-w-[300px] items-center gap-4 h-full'>
                                 <div className='flex-1 min-h-full'>
                                     <ChartContainer
                                     config={chartConfig}
@@ -216,7 +217,7 @@ const page = () => {
                                         <PolarGrid />
                                         <Radar
                                         dataKey="score"
-                                        fill="var(--color-desktop)"
+                                        fill="hsl(var(--chart-4))"
                                         fillOpacity={0.6}
                                         />
                                     </RadarChart>
@@ -246,7 +247,7 @@ const page = () => {
                                 value={nameInput}
                                 onChange={handleNameChange}
                                 onKeyDown={handleKeyPress}
-                                placeholder={user?.name || "John"}
+                                placeholder={user?.name || "Dan the Man"}
                                 />
                             </div>
 
@@ -272,15 +273,15 @@ const page = () => {
                                 value={goalInput}
                                 onChange={handleGoalChange}
                                 onKeyDown={handleKeyPress}
-                                placeholder={user?.goal || "Set a goal"}
+                                placeholder={user?.goal || "Professional Rizzler"}
                                 />
                             </div>
                         </div>
 
                         {/* CONFETTI */}
                         {/* Button to trigger confetti */}
-      <Button variant="secondary" onClick={handleConfetti}>
-        Celebrate!
+      <Button variant="secondary" onClick={handleConfetti} className='mt-4'>
+        Save
       </Button>
 
       {/* Confetti animation with opacity fade */}

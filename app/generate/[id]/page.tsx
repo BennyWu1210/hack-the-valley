@@ -35,11 +35,11 @@ const GeneratePage = ({ params }: { params: Params }) => {
   const [loadingState, setLoadingState] = useState<string>("");  // "" means done loading, non-empty string shows a message
 
   const scores = {
-    overallScore: 3,
-    contentAccuracy: 5,
-    creativity: 10,
-    organizationClarity: 7,
-    technicalSkills: 10,
+    overallScore: 7.4,
+    contentAccuracy: 8.3,
+    creativity: 7.1,
+    organizationClarity: 6.2,
+    technicalSkills: 8.2,
   };
 
   const handleGoBack = () => {
@@ -62,8 +62,11 @@ const GeneratePage = ({ params }: { params: Params }) => {
     setLoadingState("Regenerating resume...");
   
     try {
+      // Convert info to a JSON string
+      const infoString = info ? JSON.stringify(info) : '';
+  
       // Fetch blocks and regenerate the resume content
-      const blocks = await fetchBlocks(masterResumeText, info.toString()); // Await the blocks fetch
+      const blocks = await fetchBlocks(masterResumeText, infoString); // Pass infoString instead of info
       await generateResume(items, blocks, setLoadingState, editorRef); // Await the resume generation and pass editorRef
   
       setLoadingState("");  // Done regenerating
@@ -72,14 +75,12 @@ const GeneratePage = ({ params }: { params: Params }) => {
       setLoadingState("");  // Error, stop loading
     }
   };
-  
-  
 
   useEffect(() => {
     console.log("Master text:", masterResumeText);
-    const resumeLink = resumeList[1].link;
+    const resumeLink = resumeList[resumeList.length - 1].link;
     console.log("Resume link:", resumeLink);
-    
+  
     const callScraperAPI = async () => {
       try {
         setLoadingState("Fetching job data...");
@@ -92,7 +93,7 @@ const GeneratePage = ({ params }: { params: Params }) => {
             link: resumeLink,
           }),
         });
-
+  
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
@@ -100,31 +101,35 @@ const GeneratePage = ({ params }: { params: Params }) => {
         console.log("Fetched data:", data);
         setInfo(data);
         setIsLoading(false); // Set loading to false after data is fetched
-
-        // Now fetch the blocks after info has been set
-        setLoadingState("Fetching resume blocks...");
-        fetchBlocks(masterResumeText, data.toString())
-        .then(async (blocks) => {
-          // Once blocks are fetched, generate the resume
-          await generateResume(items, blocks, setLoadingState, editorRef); // Await the resume generation and pass editorRef
-          
-          setLoadingState("");  // Done
-        })
-        .catch((error) => {
-          console.error('Error fetching blocks:', error);
-          setLoadingState("");  // Stop loading if an error occurs
-        });
-      
-
       } catch (error) {
         console.error("Error calling scraper API:", error);
         setIsLoading(false); // Stop the loading spinner if an error occurs
         setLoadingState("");  // Stop loading if an error occurs
       }
     };
-
+  
     callScraperAPI();
   }, [resumeList]);
+  
+  useEffect(() => {
+    if (info !== null) {
+      const infoString = info ? JSON.stringify(info) : ''; // Convert info to JSON string
+  
+      setLoadingState("Fetching resume blocks...");
+      fetchBlocks(masterResumeText, infoString)
+        .then(async (blocks) => {
+          console.log("Job desc: ", infoString);
+          await generateResume(items, blocks, setLoadingState, editorRef); // Await the resume generation and pass editorRef
+  
+          setLoadingState("");  // Done
+        })
+        .catch((error) => {
+          console.error('Error fetching blocks:', error);
+          setLoadingState("");  // Stop loading if an error occurs
+        });
+    }
+  }, [info]); // Trigger this effect only when info changes
+  
 
   const exportToPDF = async () => {
     if (editorRef.current) {

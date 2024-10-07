@@ -169,11 +169,12 @@ func GenerateResumeHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON request"})
 		return
 	}
+	fmt.Println("====", input.JobDescription)
 
 	// Create the GPT-4 message with the provided resume content
 	messages := []Message{
 		{Role: "system", Content: "You are a helpful assistant who generates structured resumes. Wrap the text that is most relevant to the job description with <strong></strong> tag. Description should all be in bullet point formate"},
-		{Role: "user", Content: "Please generate a structured resume from the following input that is most relevant to the job description\n\nResume:" + input.Resume + "\n\njob description:" + input.JobDescription},
+		{Role: "user", Content: "Please generate a structured resume from the following input that is MOST RELAVENT to the job description:" + input.JobDescription + "\n\nresume:" + input.Resume},
 	}
 
 	// Define the schema for the expected response

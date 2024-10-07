@@ -30,8 +30,10 @@ export default function ResumeItem({ resume, addButton = false, addNewResume = (
   };
 
   const component = <div className="flex flex-col items-center h-64 w-40">
-    <div className={`h-52 w-40 p-2 rounded-md border ${addButton ? "border-dashed" : ""} hover:border-primary border-gray-950`}>
-      {!addButton ? resume.name : <div className="flex justify-center items-center w-full h-full text-4xl">+</div>}
+    <div className={`h-52 w-40 p-1 rounded-md border ${addButton ? "border-dashed" : ""} hover:border-primary border-gray-950`}>
+      {!addButton ? 
+        <img src="/images/thumbnail.png" alt="grip" style={{ width: '230px', height: '100%', overflow: 'hidden' }} />
+      : <div className="flex justify-center items-center w-full h-full text-4xl">+</div>}
     </div>
     <span>{resume.name}</span>
     {!addButton && <span className="font-light text-xs">{resume.date.toDateString()}</span>}

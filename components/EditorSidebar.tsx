@@ -156,7 +156,7 @@ export default function EditorSidebar({
               <h2 className="text-xl font-semibold text-center mb-[-5px]">
                 Overall Score
               </h2>
-              <RadialChart score={3} isSmall={false} />
+              <RadialChart score={scores.overallScore} isSmall={false} />
             </div>
 
             {/* Small Boxes */}
@@ -164,7 +164,7 @@ export default function EditorSidebar({
               <h3 className="text-sm font-semibold text-center mb-[-15px]">
                 Content & Accuracy
               </h3>
-              <RadialChart score={5} isSmall={true} />
+              <RadialChart score={scores.contentAccuracy} isSmall={true} />
               <p className="text-center mt-[-15px] text-xs text-slate-500">
                 Covers material with correct, accurate information.
               </p>
@@ -173,7 +173,7 @@ export default function EditorSidebar({
               <h3 className="text-sm font-semibold text-center mb-[-15px]">
                 Creativity
               </h3>
-              <RadialChart score={10} isSmall={true} />
+              <RadialChart score={scores.creativity} isSmall={true} />
               <p className="text-center mt-[-15px] text-xs text-slate-500">
                 Original ideas with unique, inventive approach.
               </p>
@@ -182,7 +182,7 @@ export default function EditorSidebar({
               <h3 className="text-sm font-semibold text-center mb-[-15px]">
                 Organization & Clarity
               </h3>
-              <RadialChart score={10} isSmall={true} />
+              <RadialChart score={scores.organizationClarity} isSmall={true} />
               <p className="text-center mt-[-15px] text-xs text-slate-500">
                 Clear structure with logical, understandable flow.
               </p>
@@ -191,7 +191,7 @@ export default function EditorSidebar({
               <h3 className="text-sm font-semibold text-center mb-[-15px]">
                 Technical Skills
               </h3>
-              <RadialChart score={10} isSmall={true} />
+              <RadialChart score={scores.technicalSkills} isSmall={true} />
               <p className="text-center mt-[-15px] text-xs text-slate-500">
                 Demonstrates strong mastery of technical skills.
               </p>
